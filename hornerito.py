@@ -1,13 +1,15 @@
-# requirements decouple, discord, bs4, requests, 
+# requirements decouple, discord, bs4, requests, selenium, #google-search-results(serp_api)
 # Dependencies imports
 from decouple import config
 import discord
 # Local scripts
 import wikiscraper
+import youtubescraper
 
 token = config('TOKEN')
 
 wiki_web = wikiscraper.WikiWeb()
+yt_web = youtubescraper.YoutubeWeb()
 
 no_result_message = '''Sorry, we can\'t find what you are searching for.'''
 
@@ -36,5 +38,10 @@ async def on_message(message):
         key_words, search_words = wiki_web.key_words_search_words(message_content)
         result = wiki_web.search(key_words)
         await message.channel.send(result.text)
+    if f'$tutorial' in message_content:
+        key_words, search_words = yt_web.key_words_search_words(message_content)
+        results = yt_web.get_video_results(key_words)
+        
+        await message.channel.send(results[0]+' \n'+results[1]+'\n'+results[2])
 
 client.run(token)

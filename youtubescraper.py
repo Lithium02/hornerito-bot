@@ -1,28 +1,43 @@
-# import requests
-# from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-# class WikiWeb:
-#   def __init__(self):
-#         self.headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.3'}
-#         self.url = 'https://es.wikipedia.org/wiki/'
+class YoutubeWeb:
+    def __init__(self):
+        self.headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.3'}
+        self.url = 'https://www.youtube.com/results?search_query='
 
-#   def key_words_search_words(self, user_message):
-#     words = user_message.split()[1:]
-#     keywords = '_'.join(words)
-#     search_words = ' '.join(words)
-#     return keywords, search_words
 
-#   def search(self, keywords):
-#     response = requests.get(self.url+keywords, headers = self.headers)
-#     content = response.content
-#     soup = BeautifulSoup(content, 'html.parser')
-#     result = soup.find('p')
-#     return result
-      
-#   def send_link(self, result_links, search_words): 
-#     send_link = set()
-#     for link in result_links:
-#         text = link.text.lower()
-#         if search_words in text:  
-#           send_link.add(link.get('href'))
-#     return send_link
+    def key_words_search_words(self, user_message):
+        words = user_message.split()[1:]
+        keywords = '+'.join(words)
+        search_words = ' '.join(words)
+        return keywords, search_words
+    
+    def get_video_results(self, keywords):
+        driver = webdriver.Chrome()
+        driver.get(self.url+keywords)
+
+        youtube_data = []
+
+        for i in range(6):
+            # end_result = "No more results" string at the bottom of the page
+            # this will be used to break out of the while loop
+            end_result = driver.find_element(By.CSS_SELECTOR, '#message')
+            driver.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
+            # time.sleep(1) # could be removed
+            # print(end_result.is_displayed())
+
+            # once element is located, break out of the loop
+            if end_result.is_displayed():
+                break
+
+        #print('Extracting results. It might take a while...')
+
+        for result in driver.find_elements(By.CSS_SELECTOR, '.text-wrapper.style-scope.ytd-video-renderer'):
+            link = result.find_element(By.CSS_SELECTOR, '.title-and-badge.style-scope.ytd-video-renderer a').get_attribute('href')
+
+            youtube_data.append(link)
+
+
+        driver.quit()
+        return youtube_data
