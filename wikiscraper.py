@@ -7,7 +7,7 @@ class WikiWeb:
         self.url = 'https://es.wikipedia.org/wiki/'
 
   def key_words_search_words(self, user_message):
-    words = user_message.split()[1:]
+    words = user_message.split()[0:]
     keywords = '_'.join(words)
     search_words = ' '.join(words)
     return keywords, search_words

@@ -1,5 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+chrome_options = Options()
+chrome_options.add_argument("--disable-extensions")
+chrome_options.add_argument("--disable-gpu")
+#chrome_options.add_argument("--no-sandbox") # linux only
+chrome_options.add_argument("--headless")
 
 class YoutubeWeb:
     def __init__(self):
@@ -8,13 +14,13 @@ class YoutubeWeb:
 
 
     def key_words_search_words(self, user_message):
-        words = user_message.split()[1:]
+        words = user_message.split()[0:]
         keywords = '+'.join(words)
         search_words = ' '.join(words)
         return keywords, search_words
     
     def get_video_results(self, keywords):
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(options=chrome_options)
         driver.get(self.url+keywords)
 
         youtube_data = []
